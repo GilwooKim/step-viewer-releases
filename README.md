@@ -12,6 +12,14 @@ Windows x64용 CAD 뷰어 · 형식 변환 · 기본 솔리드/서페이스 편�
 
 저장 중이거나 저장하지 않은 변경 사항이 있으면 종료 보호 절차를 거칩니다. CAD 파일은 로컬에서 처리되고 업로드되지 않습니다. 설치된 사용자에게 GitHub 계정이나 토큰이 필요하지 않습니다.
 
+## 다중 부품 삭제와 CAD 메모리 개선 (2.7.0)
+
+일반·정밀 CAD 모드에서 Shift+클릭으로 여러 부품을 선택하고 **선택 부품 삭제**, 편집 패널의 **삭제**, 또는 **Delete** 키로 한 번에 삭제합니다. **Ctrl+Z** 한 번으로 그룹 전체와 조립 구조를 복원하고 **Ctrl+Y**로 다시 삭제합니다. 전부 삭제한 빈 문서도 프로젝트로 저장할 수 있습니다.
+
+삭제는 남은 부품의 형상과 좌표를 그대로 보존하고 전체 모델을 재계산하지 않습니다. CAD 작업이 끝나면 계산 엔진의 메모리를 해제하여 반복 편집 후 STEP 내보내기에서 발생하던 메모리 누적 문제를 해결했습니다. 오류가 발생해도 현재 편집은 유지됩니다.
+
+Multi-part deletion works in mesh and precision CAD modes, with atomic undo/redo. CAD engines are released after each operation to prevent accumulated native memory during edits and STEP export. Remaining exact geometry and assembly structure are preserved.
+
 ## 언어와 앱 설정 (2.6.0)
 
 설치 시작 시 **English / 한국어**를 선택합니다. 설치 언어가 앱의 첫 실행에도 적용되며, 앱에서 이미 선택한 언어는 유지합니다. 자동 업데이트는 언어 선택 창 없이 진행하며 이전 설치 언어도 유지합니다.
