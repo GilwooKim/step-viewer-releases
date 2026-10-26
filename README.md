@@ -2,6 +2,14 @@
 
 Windows x64용 CAD 뷰어 · 형식 변환 · 기본 솔리드/서페이스 편집 프로그램입니다.
 
+## 대형 메시 STEP 저장과 원본 형상 유지 (2.8.0)
+
+메시 STEP의 50,000 삼각형 제한을 제거했습니다. 별도 작업 스레드에서 작은 단위로 파일을 기록하고, 생성한 대형 메시 STEP을 최대 2 GiB까지 다시 열 수 있습니다. 정밀 STEP과 프로젝트는 최대 1 GiB입니다. 형상 복잡도와 가용 메모리에 따른 제한은 남아 있습니다.
+
+일반 모드에서 부품을 삭제·이동·회전·복제하거나 이름을 바꿔도 STEP 원본 연결이 유지됩니다. 내보내기의 **STEP 형상 → 자동**은 원본 솔리드와 곡면을 보존합니다. **메시**를 선택하면 삼각형 평면으로 저장하므로 이전 버전에서 원본 연결이 사라진 프로젝트도 내보낼 수 있습니다. 프로젝트 저장·재열기와 실행 취소에도 원본 연결을 유지하며, 삭제된 부품을 다시 포함하지 않습니다.
+
+Removes the 50,000-triangle mesh STEP export limit with streamed writing and fast reopening of generated large mesh STEP files. Mesh-mode edits preserve the original STEP reference, allowing automatic precise export without changing the active editing mode.
+
 ## 다운로드
 
 [최신 버전 설치](https://github.com/GilwooKim/step-viewer-releases/releases/latest)에서 `STEP-Viewer-Setup-<version>-x64.exe`를 실행하세요. Windows 10/11 x64용이며 설치 파일은 코드 서명이 없습니다.
