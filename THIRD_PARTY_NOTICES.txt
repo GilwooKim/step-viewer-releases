@@ -1,0 +1,54 @@
+STEP Viewer 2.0.1 — Third-party notices
+
+The application and OpenSKP bridge are distributed under GPL-3.0-only.
+The full source distribution accompanies the installer as
+STEP-Viewer-Source-2.0.1.zip. Individual dependencies keep their own licenses.
+Application code and generated examples: copyright (c) 2026 STEP Viewer contributors.
+
+Electron 44.9.3 — MIT; includes Chromium, Node.js, and associated components.
+https://github.com/electron/electron
+LICENSE.electron.txt and LICENSES.chromium.html accompany the application.
+
+Three.js 0.186.1 — MIT. https://github.com/mrdoob/three.js
+Replicad 1.1.0 — MIT. https://github.com/sgenoud/replicad
+fflate 0.8.3 — MIT. https://github.com/101arrowz/fflate
+dxf-parser 1.1.2, loglevel — MIT. https://github.com/gdsestimating/dxf-parser
+Rhino3dm 8.35.0 — MIT. https://github.com/mcneel/rhino3dm
+Rhino3dm includes OpenNURBS, Draco, zlib, and related components.
+Corresponding copyright and license texts are in dist/licenses.
+
+occt-import-js 0.0.23 — LGPL-2.1; copyright Viktor Kovacs and contributors.
+https://github.com/kovacsv/occt-import-js
+replicad-opencascadejs 1.1.0 — LGPL-2.1-only; copyright Steve Genoud and contributors.
+https://github.com/sgenoud/replicad
+Open CASCADE Technology — LGPL-2.1 with the Open CASCADE exception.
+https://github.com/Open-Cascade-SAS/OCCT
+opencascade.js — LGPL-2.1 with the OCCT exception; includes FreeType and RapidJSON.
+https://github.com/taucad/opencascade.js
+The unmodified library loaders and WASM modules remain replaceable in
+resources/app.asar.unpacked/dist/vendor/. Reverse engineering for debugging
+modifications to these libraries is permitted. See SOURCE-DEPENDENCIES.txt.
+
+LibreDWG 0.14 — GPL-3.0-or-later. https://www.gnu.org/software/libredwg/
+Unmodified dwg2dxf.exe, dxf2dwg.exe and libredwg-0.dll in resources/tools/libredwg.
+Full corresponding source, Windows build scripts and license accompany the source ZIP.
+
+OpenSKP 0.5.0 (a6788afa6386cfd4bc781998dca99c591b3fb069) — GPL-3.0-only.
+Copyright Kurt Granroth and contributors. https://github.com/hew3d/openskp
+The unmodified core source and its dependency sources, plus our skp-bridge source,
+are in native/. The bridge exports only static geometry, not the whole SDK surface.
+Rust dependency license texts are included in dist/licenses/rust-*.
+
+Assimp 6.0.5 — BSD-3-Clause. https://github.com/assimp/assimp
+The unmodified official x64 DLL and our thin C API adapter are in resources/tools/assimp.
+Assimp and bundled third-party license texts are in dist/licenses/assimp-*.
+Microsoft Visual C++ Runtime 14.44 — Microsoft redistribution terms.
+See dist/licenses/Microsoft-VC-Runtime.txt. These system runtime components remain
+under their own terms and are not relicensed under GPL.
+
+This product is not affiliated with or endorsed by Autodesk, Trimble, McNeel,
+Microsoft, or other file-format and product trademark owners.
+
+Automatic updates: electron-updater 6.8.9 (MIT) and bundled dependencies.
+Complete dependency notices are included in runtime/LICENSES.txt.
+Pinned source versions and registry integrity hashes are in package-lock.json.

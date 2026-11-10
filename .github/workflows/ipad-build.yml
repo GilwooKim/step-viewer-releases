@@ -1,0 +1,50 @@
+name: iPad native build
+on:
+  push:
+    branches: [codex/ipad-native]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ipad-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run sync && node scripts/configure-ios.mjs
+      - name: Select latest installed Xcode
+        run: |
+          XCODE=$(python3 -c 'import glob,re; p=glob.glob("/Applications/Xcode_*.app"); print(max(p,key=lambda s:tuple(map(int,re.findall(r"\d+",s)))))')
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+      - name: Build unsigned simulator app
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData CODE_SIGNING_ALLOWED=NO build | tee simulator-build.log
+      - name: Run native WebKit and CAD smoke test
+        run: bash scripts/simulator-smoke.sh
+      - name: Build unsigned device archive
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' -archivePath build/STEP-Viewer-iPad.xcarchive CODE_SIGNING_ALLOWED=NO archive | tee device-build.log
+      - name: Package simulator
+        run: ditto -c -k --keepParent DerivedData/Build/Products/Debug-iphonesimulator/App.app build/STEP-Viewer-iPad-Simulator.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iPad-build-and-verification
+          retention-days: 30
+          path: |
+            build/
+            *-build.log
+            native-smoke.json
+            simulator.png

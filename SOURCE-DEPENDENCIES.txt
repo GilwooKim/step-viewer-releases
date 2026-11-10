@@ -1,0 +1,54 @@
+Corresponding sources for STEP Viewer
+
+The adjacent STEP-Viewer-Source-<version>.zip includes app source, native adapters,
+binary dependencies, and the following upstream archives under third-party-sources/:
+
+occt-import-js 0.0.23, commit c2148e54b456b571238d35cac037d304053d64b2
+  https://github.com/kovacsv/occt-import-js
+  Its OCCT submodule: d2abb6d844231cb8f29be6894440874a4700e4a5
+  https://github.com/Open-Cascade-SAS/OCCT
+  Extract OCCT into the importer occt/ directory. Follow tools/setup_emscripten_win.bat
+  and the included README build scripts (Emscripten 3.1.69, MinGW 7.1.0, CMake).
+
+replicad / replicad-opencascadejs 1.1.0
+  https://github.com/sgenoud/replicad/tree/e4b05f67dc4e2393a876ce8c5064a9c93db05bf1
+  Build instructions and custom binding configs: packages/replicad-opencascadejs/.
+  npm run build generates configs with ytt and links using the pinned Docker image:
+  ghcr.io/taucad/opencascade.js:canary-ebd263f1-single-threaded
+  Corresponding opencascade.js source is included at ebd263f1. Follow BUILD_SYSTEM.md,
+  Dockerfile, and DEPS.json there to rebuild the compatible linking environment.
+  Pinned OCCT: b8f597c677811d1f9f4d8a97f5ae2825c0353a42 (V8_0_1)
+  Pinned FreeType: de8b92dd7ec634e9e2b25ef534c54a3537555c11
+  Pinned RapidJSON: 24b5e7a8b27f42fa16b96fc70aade9106cf7102f
+  All three source archives are included. Emscripten 5.0.1 is the build toolchain.
+  The distributed JS/WASM binaries were not modified.
+
+LibreDWG 0.14
+  https://github.com/LibreDWG/libredwg/releases/tag/0.14
+  Complete official release source: libredwg-source.tar.xz
+  SHA256 62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275
+  Official Windows binary ZIP SHA256:
+  1ad7e15344d20b3426c3435b078d82fb84b35062815946b2cca9c5fc9810fea8
+  Build using the included README, configure/Makefile or CMake build files and
+  the supplied Windows cross-build instructions. No changes to the native binaries.
+
+OpenSKP 0.5.0, a6788afa6386cfd4bc781998dca99c591b3fb069
+  Source in native/vendor/openskp; runtime core is unmodified. README and docs included.
+  Our bridge source is native/skp-bridge. All Cargo dependencies are vendored in
+  native/vendor-rust with their original license files. From native/: cargo build
+  --release --locked --offline. Rust 1.95, Windows x64 MSVC toolchain.
+
+Assimp 6.0.5 official Windows x64 DLL (unmodified; BSD-3-Clause).
+  https://github.com/assimp/assimp/releases/download/v6.0.5/windows-x64-v6.0.5.zip
+  ZIP SHA256 1ab3ac83e75e64bf3fb2b67e43c3b8436b49e25a212aa0c65813415a098d7c41
+  Adapter source in native/assimp-bridge; builds alongside skp-bridge.
+
+The main application's pinned npm source versions and integrity hashes are in
+package-lock.json. npm ci; npm run build; npm run dist rebuilds the Windows app.
+The source ZIP includes tools/ binaries so Rust is only required when changing the
+native adapters. scripts/build-native.ps1 recompiles and copies the adapters.
+
+Replacing LGPL libraries: close the application; replace both matching JS loader
+and WASM files under resources/app.asar.unpacked/dist/vendor/. The filenames are
+occt-import-js.js / .wasm, and replicad_single.js / .wasm. Native helper replacements
+belong in resources/tools/. There is no signature check restricting modified builds.

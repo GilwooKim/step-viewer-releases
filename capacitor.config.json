@@ -1,0 +1,12 @@
+{
+  "appId": "com.gilwookim.stepviewer",
+  "appName": "STEP Viewer",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#182535",
+    "preferredContentMode": "mobile",
+    "scrollEnabled": false,
+    "allowsLinkPreview": false
+  }
+}

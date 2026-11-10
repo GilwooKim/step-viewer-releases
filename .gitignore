@@ -1,0 +1,15 @@
+node_modules/
+dist/
+ios/App/App/public/
+ios/App/Pods/
+ios/App/build/
+DerivedData/
+test-results/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.p12
+*.mobileprovision
+*.p8
+.env*
+*.ipa

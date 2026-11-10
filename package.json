@@ -1,0 +1,29 @@
+{
+  "name": "step-viewer-ipad",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "build": "node scripts/build-ipad.mjs",
+    "sync": "npm run build && cap sync ios",
+    "test": "node --test tests/mobile.test.mjs",
+    "test:ui": "node tests/ipad-ui.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.6.0",
+    "@capacitor/ios": "8.6.0",
+    "dxf-parser": "1.1.2",
+    "fflate": "0.8.3",
+    "occt-import-js": "0.0.23",
+    "replicad": "1.1.0",
+    "replicad-opencascadejs": "1.1.0",
+    "rhino3dm": "8.35.0",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "@playwright/test": "1.64.1",
+    "esbuild": "0.28.2"
+  }
+}
