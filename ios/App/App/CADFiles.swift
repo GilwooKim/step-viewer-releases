@@ -42,7 +42,7 @@ class CADViewController: CAPBridgeViewController {
 public class CADFilesPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelegate {
     public let identifier = "CADFilesPlugin"
     public let jsName = "CADFiles"
-    public let pluginMethods = ["pick","describe","startup","begin","append","seal","finish","abort","setWorking","confirmClose"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
+    public let pluginMethods: [CAPPluginMethod] = ["pick","describe","startup","begin","append","seal","finish","abort","setWorking","confirmClose"].compactMap { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
     static weak var instance: CADFilesPlugin?
     static var incoming: [URL] = []
     private let io = DispatchQueue(label: "com.gilwookim.stepviewer.files", qos: .userInitiated)
@@ -55,11 +55,23 @@ public class CADFilesPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelega
     private struct Job { let folder: URL; let names: [String]; var sizes: [Int: Int] = [:]; var sealed: Set<Int> = [] }
     private var jobs: [String: Job] = [:]
     private lazy var root: URL = {
-        let url = fm.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("CAD-" + UUID().uuidString)
+        let url = fm.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("STEPViewerSession-" + UUID().uuidString)
         try? fm.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }()
-    public override func load() { Self.instance = self }
+    public override func load() {
+        Self.instance = self
+        io.async {
+            let caches = self.fm.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            let prefix = "STEPViewerSession-"
+            for url in (try? self.fm.contentsOfDirectory(at: caches, includingPropertiesForKeys: nil)) ?? [] {
+                let name = url.lastPathComponent
+                if name.hasPrefix(prefix), UUID(uuidString: String(name.dropFirst(prefix.count))) != nil {
+                    try? self.fm.removeItem(at: url)
+                }
+            }
+        }
+    }
     private func failure(_ text: String) -> NSError { NSError(domain: "CADFiles", code: 1, userInfo: [NSLocalizedDescriptionKey: text]) }
     private func info(_ url: URL) throws -> [String: Any] {
         ["path": url.absoluteString, "name": url.lastPathComponent, "size": (try url.resourceValues(forKeys: [.fileSizeKey])).fileSize ?? 0]

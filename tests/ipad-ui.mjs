@@ -1,10 +1,19 @@
 import {chromium} from '@playwright/test';
 import {createServer} from 'node:http';
-import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {readFile,mkdir,writeFile,stat} from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 const root=path.resolve('dist');
-const server=createServer(async(req,res)=>{try{const filename=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname==='/'?'/index.html':new URL(req.url,'http://localhost').pathname));if(!filename.startsWith(root+path.sep))throw Error();const bytes=await readFile(filename);const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.wasm':'application/wasm'};res.writeHead(200,{'Content-Type':types[path.extname(filename)]||'application/octet-stream'});res.end(bytes);}catch{res.writeHead(404);res.end();}});
+const server=createServer(async(req,res)=>{try{
+  const pathname=new URL(req.url,'http://localhost').pathname;
+  const filename=pathname==='/private-test.step'&&process.env.STEP_VIEWER_LARGE_FILE?process.env.STEP_VIEWER_LARGE_FILE:path.resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));
+  if(!filename.startsWith(root+path.sep)&&filename!==process.env.STEP_VIEWER_LARGE_FILE)throw Error();
+  const bytes=await readFile(filename),range=req.headers.range?.match(/bytes=(\d+)-(\d+)/);
+  const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.wasm':'application/wasm'};
+  const headers={'Content-Type':types[path.extname(filename)]||'application/octet-stream','Content-Length':String(bytes.length)};
+  if(range){const a=Number(range[1]),b=Number(range[2]);headers['Content-Length']=String(b-a+1);headers['Content-Range']=`bytes ${a}-${b}/${bytes.length}`;res.writeHead(206,headers);res.end(bytes.subarray(a,b+1));}
+  else{res.writeHead(200,headers);res.end(bytes);}
+}catch{res.writeHead(404);res.end();}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const browser=await chromium.launch({channel:'msedge',headless:true});
 const context=await browser.newContext({viewport:{width:1376,height:1032},isMobile:true,hasTouch:true,deviceScaleFactor:1});
@@ -23,7 +32,7 @@ await page.addInitScript(()=>{
       if(method==='finish'){const job=jobs.get(args.token);window.__exports.push({names:job.names,sizes:Object.values(job.files).map(chunks=>chunks.reduce((n,b)=>n+b.length,0))});jobs.delete(args.token);return {saved:true};}
       if(method==='abort'){jobs.delete(args.token);return {};}
       if(method==='pick'){const files=window.__pick;window.__pick=[];return {files};}
-      if(method==='describe')return {name:'Second.step',size:100000,path:args.path};
+      if(method==='describe'){const r=await fetch(args.path,{method:'HEAD'});return {name:args.path.endsWith('private-test.step')?'Large assembly.step':'Second.step',size:Number(r.headers.get('Content-Length')),path:args.path};}
       if(method==='startup')return {files:[]};
       if(method==='confirmClose')return {choice:'discard'};
       return {};
@@ -55,7 +64,17 @@ try{
   await page.locator('#settings').click();await page.locator('#settings-language').selectOption('en');
   await page.waitForFunction(()=>document.documentElement.lang==='en');assert.match(await page.locator('#update-status').innerText(),/TestFlight/);
   assert.equal(await page.locator('#export-format option[value="dwg"]').count(),0);
+  let large;
+  if(process.env.STEP_VIEWER_LARGE_FILE){
+    await page.locator('#close-settings').click();
+    const size=(await stat(process.env.STEP_VIEWER_LARGE_FILE)).size,start=Date.now();
+    await page.evaluate(size=>window.__pick=[{path:location.origin+'/private-test.step',name:'Large assembly.step',size}],size);
+    await page.locator('#open').click();
+    await page.waitForFunction(()=>document.querySelectorAll('.tab-select').length===3&&document.getElementById('loading').hidden,{},{timeout:600000});
+    large={size,parts:Number(await page.locator('#part-count').innerText()),elapsedMs:Date.now()-start};
+    assert.ok(large.parts>100);await page.screenshot({path:'test-results/ipad-large-private.png'});
+  }
   assert.deepEqual(errors,[]);
-  const report={ok:true,native,checks:['per-part native bridge export','multiple document tabs','pinch does not alter selection','portrait/landscape layout','English settings','unsupported formats hidden'],errors};
+  const report={ok:true,native,checks:['per-part native bridge export','multiple document tabs','pinch does not alter selection','portrait/landscape layout','English settings','unsupported formats hidden'],large,errors};
   await writeFile('test-results/ipad-ui.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }finally{await browser.close();await new Promise(r=>server.close(r));}
