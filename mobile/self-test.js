@@ -1,13 +1,15 @@
-import {base64,writePayload} from './files.js';
+import {Capacitor} from '@capacitor/core';
+import {writePayload,readFileBytes} from './files.js';
 export async function selfTest(Native){
   const checks=[];
   const wait=async(test,seconds=120)=>{const until=Date.now()+seconds*1000;while(!test()){if(Date.now()>until)throw new Error('Timed out: '+document.getElementById('toast').textContent);await new Promise(r=>setTimeout(r,200));}};
   let token;
   try {
-    const sample=new Uint8Array(600000);for(let i=0;i<sample.length;i++)sample[i]=i%251;
+    const sample=new Uint8Array(9*1024*1024+7);for(let i=0;i<sample.length;i++)sample[i]=i%251;
     ({token}=await Native.begin({names:['chunk-test.stl']}));
     const result=await writePayload(Native,token,0,sample);
     if(result.size!==sample.length)throw new Error('Native chunk size mismatch');
+    if(result.path){const loaded=await readFileBytes(Capacitor.convertFileSrc(result.path),result.size);for(let i=0;i<loaded.length;i++)if(loaded[i]!==sample[i])throw new Error('Native range read byte mismatch');checks.push('native ranged file read');}
     await Native.abort({token});token=null;checks.push('native chunk write / seal / cleanup');
     document.getElementById('demo').click();
     await wait(()=>Number(document.getElementById('part-count').textContent)>0);

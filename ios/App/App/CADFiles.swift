@@ -162,7 +162,8 @@ public class CADFilesPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelega
     @objc func seal(_ call: CAPPluginCall) {
         io.async {
             guard let token = call.getString("token"), var job = self.jobs[token], let index = call.getInt("index"), (job.sizes[index] ?? 0) > 0 else { call.reject("Empty output."); return }
-            job.sealed.insert(index); self.jobs[token] = job; call.resolve(["size": job.sizes[index] ?? 0])
+            job.sealed.insert(index); self.jobs[token] = job
+            call.resolve(["size": job.sizes[index] ?? 0, "path": job.folder.appendingPathComponent(job.names[index]).absoluteString])
         }
     }
     @objc func finish(_ call: CAPPluginCall) {
@@ -186,7 +187,8 @@ public class CADFilesPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelega
             for (title, choice, style) in [("Save / 저장", "save", UIAlertAction.Style.default), ("Discard / 저장 안 함", "discard", .destructive), ("Cancel / 취소", "cancel", .cancel)] {
                 dialog.addAction(UIAlertAction(title: title, style: style) { _ in call.resolve(["choice": choice]) })
             }
-            self.bridge?.viewController.present(dialog, animated: true)
+            guard let vc = self.bridge?.viewController, vc.presentedViewController == nil else { call.resolve(["choice": "cancel"]); return }
+            vc.present(dialog, animated: true)
         }
     }
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
