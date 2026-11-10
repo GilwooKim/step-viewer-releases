@@ -1,5 +1,5 @@
 import {Capacitor,registerPlugin} from '@capacitor/core';
-import {validateFile,safeName,writePayload,EXPORT_EXTENSIONS} from './files.js';
+import {validateFile,safeName,writePayload,readFileBytes,EXPORT_EXTENSIONS} from './files.js';
 import {selfTest} from './self-test.js';
 const Native=registerPlugin('CADFiles');
 const $=id=>document.getElementById(id);
@@ -8,9 +8,7 @@ const batches=new Map();
 const language=()=>localStorage.getItem('language')||(navigator.language.startsWith('ko')?'ko':'en');
 async function readFile(reference){
   validateFile(reference);
-  const response=await fetch(Capacitor.convertFileSrc(reference.path));
-  if(!response.ok)throw new Error('파일을 읽지 못했습니다.');
-  return {...reference,bytes:new Uint8Array(await response.arrayBuffer())};
+  return {...reference,bytes:await readFileBytes(Capacitor.convertFileSrc(reference.path),reference.size)};
 }
 const noConversion=async()=>({error:'이 변환은 Windows 버전에서 사용할 수 있습니다.'});
 window.desktop={
@@ -34,7 +32,7 @@ window.desktop={
   savePNG:async(data,name)=>window.desktop.saveModel(new Uint8Array(await (await fetch(data)).arrayBuffer()),'png',name),
   beginBatchExport:async(ext,names)=>{const files=names.map((n,i)=>safeName(n,ext,i+1));const {token}=await Native.begin({names:files});batches.set(token,files);return {token,folderName:'파일 앱 / Files'};},
   writeBatchExport:async(token,index,payload)=>{await writePayload(Native,token,index,payload,onProgress);return {name:batches.get(token)[index],saved:true};},
-  endBatchExport:async token=>{try{const r=await Native.finish({token});return r.saved?r:{error:'파일 앱으로 내보내기를 취소했습니다.'};}finally{batches.delete(token);}},
+  endBatchExport:async token=>{try{const r=await Native.finish({token});return r.saved?r:{error:'파일 앱으로 내보내기를 취소했습니다.'};}catch(error){await Native.abort({token});throw error;}finally{batches.delete(token);}},
   onMeshStepProgress:callback=>{onProgress=callback;},
   updateState:async()=>({currentVersion:'1.0.0 · iPad',status:'store',configured:false}),
   onUpdateState:()=>{},checkUpdates:async()=>{},downloadUpdate:async()=>{},installUpdate:async()=>{},setAutomaticUpdates:async()=>{}

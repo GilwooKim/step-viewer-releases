@@ -2,6 +2,18 @@ export const MAX_IMPORT = 512 * 1024 * 1024;
 export const CHUNK_SIZE = 256 * 1024;
 export const IMPORT_EXTENSIONS = ['step','stp','stl','obj','glb','gltf','3mf','dxf','fbx','dae','3ds','usdz','svcad'];
 export const EXPORT_EXTENSIONS = ['step','stl','obj','glb','3mf','dxf','usdz'];
+export async function readFileBytes(url,size,fetchFile=fetch) {
+  const output=new Uint8Array(size),block=4*1024*1024;
+  for(let start=0;start<size;start+=block){
+    const end=Math.min(size,start+block)-1;
+    const response=await fetchFile(url,{headers:{Range:`bytes=${start}-${end}`}});
+    if(!response.ok||!(response.status===206||(start===0&&end===size-1&&response.status===200)))throw new Error('파일을 나누어 읽지 못했습니다. 파일 앱에서 다시 열어 주세요.');
+    const chunk=new Uint8Array(await response.arrayBuffer());
+    if(chunk.length!==end-start+1)throw new Error('파일 크기가 변경되었거나 읽기가 중단되었습니다.');
+    output.set(chunk,start);
+  }
+  return output;
+}
 export function validateFile(file) {
   if(!IMPORT_EXTENSIONS.includes(file.name.split('.').pop().toLowerCase()))throw new Error('이 형식은 iPad에서 지원하지 않습니다. STEP, STL, OBJ 또는 GLB로 변환해 주세요.');
   if(!Number.isSafeInteger(file.size)||file.size<=0||file.size>MAX_IMPORT)throw new Error('iPad에서는 512MB 이하의 파일을 열 수 있습니다.');

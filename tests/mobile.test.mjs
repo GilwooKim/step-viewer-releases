@@ -1,7 +1,13 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {validateFile,safeName,MAX_IMPORT,CHUNK_SIZE,writePayload} from '../mobile/files.js';
+import {validateFile,safeName,MAX_IMPORT,CHUNK_SIZE,writePayload,readFileBytes} from '../mobile/files.js';
+test('native reads use bounded binary ranges, rejecting truncated files',async()=>{
+  const source=new Uint8Array(9*1024*1024+7);source[0]=13;source[source.length-1]=249;let requests=0;
+  const result=await readFileBytes('test',source.length,async(_url,{headers})=>{requests++;const [,a,b]=headers.Range.match(/bytes=(\d+)-(\d+)/);assert.ok(Number(b)-Number(a)<4*1024*1024);return new Response(source.subarray(Number(a),Number(b)+1),{status:206});});
+  assert.equal(requests,3);assert.deepEqual(result,source);
+  await assert.rejects(readFileBytes('test',20,async()=>new Response(new Uint8Array(10),{status:206})),/파일 크기/);
+});
 import {facetedStepChunks} from '../src/step-stream.js';
 test('device file budget and unsupported converters',()=>{
   validateFile({name:'assembly.STEP',size:400*1024*1024});

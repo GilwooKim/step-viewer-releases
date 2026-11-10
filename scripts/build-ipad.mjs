@@ -19,5 +19,6 @@ html=html.replace('width=device-width, initial-scale=1','width=device-width, ini
 await writeFile('dist/index.html',html);
 for(const name of ['demo.step','icon.png'])await copyFile(`assets/${name}`,`dist/${name}`);
 await cp('licenses','dist/licenses',{recursive:true});
+await copyFile('node_modules/@capacitor/core/LICENSE','dist/licenses/Capacitor-LICENSE.txt');
 await copyFile('LICENSE','dist/LICENSE.txt');
 console.log('Built offline iPad application assets.');

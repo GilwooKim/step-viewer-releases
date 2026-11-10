@@ -537,5 +537,18 @@
   "STEP / 프로젝트 파일이 1 GB를 초과합니다. 부품별 파일로 나누어 주세요.": "The STEP / project file exceeds 1 GB. Split it into separate part files.",
   "STEP / 프로젝트 저장 데이터가 잘못되었거나 1 GB를 초과합니다.": "STEP / project export data is invalid or exceeds 1 GB.",
   "STEP 원본의 정밀 형상을 읽고 있습니다…": "Reading precise geometry from the original STEP…",
-  "부품 편집을 STEP 원본에 적용하고 있습니다…": "Applying part edits to the original STEP…"
+  "부품 편집을 STEP 원본에 적용하고 있습니다…": "Applying part edits to the original STEP…",
+  "다중 선택": "Multi-select",
+  "부품": "Parts",
+  "다중 선택을 켜고 부품을 탭해 추가 / 해제": "Turn on Multi-select, then tap parts to add / remove",
+  "한 손가락 회전 · 두 손가락 이동 / 확대": "One finger to orbit · Two fingers to pan / zoom",
+  "파일은 이 iPad에서만 처리됩니다.": "Files are processed only on this iPad.",
+  "파일 앱에서 CAD 파일을 선택하세요.": "Choose a CAD file from the Files app.",
+  "iPad 앱 업데이트는 TestFlight 또는 App Store에서 설치합니다.": "Install iPad app updates through TestFlight or the App Store.",
+  "TestFlight / App Store에서 업데이트를 확인하세요.": "Check TestFlight / App Store for updates.",
+  "메모리가 부족합니다. 작업을 저장하고 사용하지 않는 파일 탭을 닫아 주세요.": "Memory is low. Save your work and close unused document tabs.",
+  "메모리 보호를 위해 사용하지 않는 파일 탭을 저장하고 닫아 주세요.": "Save and close unused document tabs to free memory.",
+  "이 형식은 iPad에서 지원하지 않습니다. STEP, STL, OBJ 또는 GLB로 변환해 주세요.": "This format is not supported on iPad. Convert it to STEP, STL, OBJ or GLB.",
+  "iPad에서는 512MB 이하의 파일을 열 수 있습니다.": "On iPad, open files up to 512 MB.",
+  "파일 앱으로 내보내기를 취소했습니다.": "Export to Files was canceled."
 }
