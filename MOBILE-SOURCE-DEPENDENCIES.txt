@@ -1,0 +1,38 @@
+STEP Viewer iPad source and rebuild information
+
+Application source: this branch, GPL-3.0-only; LICENSE.
+Capacitor 8.6.0: MIT, https://github.com/ionic-team/capacitor/tree/8.6.0
+Its Swift binary package: https://github.com/ionic-team/capacitor-swift-pm/tree/8.6.0
+Other exact npm versions and integrity hashes: package-lock.json.
+
+The OpenCascade WASM loaders and binaries are unmodified and are the same
+versions used in STEP Viewer desktop 2.8.0. Their complete upstream source,
+binding configurations, pinned toolchains and build instructions are in:
+https://github.com/GilwooKim/step-viewer-releases/releases/download/v2.8.0/STEP-Viewer-Source-2.8.0.zip
+SHA256: 26ef8ce9a2c38d1f899d9437777a093c0c15e7ea4805c90be2ced105afa33568
+
+Relevant archive directory: third-party-sources/.
+  occt-import-js-0.0.23-source.tar.gz
+  OCCT-d2abb6d8-source.tar.gz
+  replicad-e4b05f67-source.tar.gz
+  opencascade-js-ebd263f1-source.tar.gz
+  OCCT-b8f597c6-source.tar.gz
+  freetype-de8b92dd-source.tar.gz
+  rapidjson-24b5e7a8-source.tar.gz
+
+The original SOURCE-DEPENDENCIES.txt describes the pinned source revisions and
+compiler versions. Its Windows-specific adapters and runtime replacement paths
+do not apply to this iPad build; LibreDWG, OpenSKP and native Assimp are excluded.
+
+To replace/relink an LGPL engine, build the corresponding JS and WASM from those
+sources, replace its files in node_modules/occt-import-js/dist/ or
+node_modules/replicad-opencascadejs/dist/, then run:
+  npm run sync
+  node scripts/configure-ios.mjs
+Build ios/App/App.xcodeproj with Xcode and sign it with your own provisioning.
+The app does not check engine hashes. iPadOS still requires an Apple-accepted
+signature for installation; platform signing is separate from application code.
+
+For public binary redistribution, preserve all notices and provide the
+corresponding source archive as well as this app source. Runtime notices are
+included in the bundled licenses directory.
