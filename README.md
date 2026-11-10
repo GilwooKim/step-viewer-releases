@@ -1,5 +1,9 @@
 # STEP Viewer
 
+이 `codex/ipad-native` 브랜치에는 **iPad 앱 개발 버전**이 들어 있습니다. [iPad 한국어 안내](IPAD-KO.md)와 [빌드·지원 형식 안내](IPAD.md)를 확인하세요. Apple 개발자 서명과 TestFlight 배포는 아직 진행하지 않았습니다.
+
+아래는 기반이 된 Windows 2.8.0 릴리스 안내입니다.
+
 Windows x64용 CAD 뷰어 · 형식 변환 · 기본 솔리드/서페이스 편집 프로그램입니다.
 
 ## 대형 메시 STEP 저장과 원본 형상 유지 (2.8.0)
